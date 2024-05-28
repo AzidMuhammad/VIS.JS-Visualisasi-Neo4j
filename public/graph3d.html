@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Graph 3D demo</title>
+  <script type="text/javascript" src="https://unpkg.com/vis-graph3d@latest/dist/vis-graph3d.min.js"></script>
+  <style type="text/css">
+    body {
+    font-family: 'Times New Roman', Times, serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+    }
+    .navbar {
+      width: 100%;
+      overflow: hidden;
+      background-color: #000000;
+      text-align: left;
+    }
+    .navbar a {
+      display: inline-block;
+      color: whitesmoke;
+      padding: 20px 20px;
+      text-decoration: none;
+    }
+    .navbar a:hover {
+      background-color: #ddd;
+      color: black;
+    }
+    #mygraph {
+      width: 50%;
+      height: 600px;
+      margin: 20px 0 100px 0; /* Updated margin for centering and bottom space */
+    }
+  </style>
+  <script type="text/javascript">
+    async function fetchGraph3DData() {
+      try {
+        const response = await fetch('/graph3d-data');
+        if (!response.ok) {
+          throw new Error('Graph3D response was not ok ' + response.statusText);
+        }
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('Error fetching graph3D data:', error);
+      }
+    }
+
+    async function drawVisualization() {
+      const graph3DData = await fetchGraph3DData();
+      if (graph3DData) {
+        var data = new vis.DataSet();
+        graph3DData.forEach((item, index) => {
+          data.add({ id: index, x: item.x, y: item.y, z: item.z, style: item.style });
+        });
+
+        var options = {
+          width: '100%', // Adjusted width to fit container
+          height: '100%', // Adjusted height to fit container
+          style: 'dot',
+          showPerspective: true,
+          showGrid: true,
+          showShadow: true,
+          keepAspectRatio: true,
+          verticalRatio: 0.5,
+          tooltip: function (point) {
+            return `<div>${point.data.style}</div>`;
+          }
+        };
+
+        var container = document.getElementById('mygraph');
+        new vis.Graph3d(container, data, options);
+      }
+    }
+  </script>
+</head>
+<body onload="drawVisualization();">
+  <div class="navbar">
+    <a href="index.html">Network</a>
+    <a href="timeline.html">Timeline</a>
+    <a href="graph3d.html">Graph3D</a>
+  </div>
+  <div id="mygraph"></div>
+</body>
+</html>

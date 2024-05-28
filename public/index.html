@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Vis.js Network Example</title>
+  <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <style type="text/css">
+    #mynetwork {
+      width: 100%;
+      height: 640px;
+      border: 1px solid lightgray;
+      margin-top: 20px;
+    }
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+    }
+      .navbar {
+        width: 100%;
+        overflow: hidden;
+        background-color: #000000;
+        text-align: left;
+      }
+      .navbar a {
+        display: inline-block;
+        color: whitesmoke;
+        padding: 20px 20px;
+        text-decoration: none;
+      }
+      .navbar a:hover {
+        background-color: #ddd;
+        color: black;
+      }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <a href="index.html">Network</a>
+    <a href="timeline.html">Timeline</a>
+    <a href="graph3d.html">Graph3D</a>
+  </div>
+  <div id="mynetwork"></div>
+
+  <script type="text/javascript">
+    async function fetchNetworkData() {
+      try {
+        const response = await fetch('/network-data');
+        if (!response.ok) {
+          throw new Error('Network response was not ok ' + response.statusText);
+        }
+        const data = await response.json();
+        console.log('Fetched network data:', data);
+        return data;
+      } catch (error) {
+        console.error('Error fetching network data:', error);
+      }
+    }
+
+    async function createNetwork() {
+      const networkData = await fetchNetworkData();
+      if (networkData) {
+        const containerNetwork = document.getElementById('mynetwork');
+        const dataNetwork = {
+          nodes: new vis.DataSet(networkData.nodes),
+          edges: new vis.DataSet(networkData.edges)
+        };
+        const optionsNetwork = {
+          nodes: {
+            shape: 'image',
+            size: 16,
+            font: {
+              size: 16,
+              color: '#000000'
+            },
+            color: {
+              background: '#ffffff',
+              border: '#000000'
+            }
+          },
+          edges: {
+            font: {
+              size: 14,
+              align: 'top'
+            },
+            color: '#000000',
+            labelHighlightBold: true
+          },
+          physics: {
+            enabled: true
+          }
+        };
+        new vis.Network(containerNetwork, dataNetwork, optionsNetwork);
+      } else {
+        console.error('No network data available.');
+      }
+    }
+
+    createNetwork();
+  </script>
+</body>
+</html>
